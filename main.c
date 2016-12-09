@@ -11,15 +11,15 @@
 
 int main(void) {
 	tdTree *pRoot = NULL, *ptr = NULL;
-	char *pTemp =  NULL, *pFree = NULL;
-	int addSel, menuSel, options = 1111, num, tbi = 0;
+	char *pTemp =  NULL, *pFree = NULL, *filename;
+    FILE* pToFile = NULL;
+	int addSel, menuSel = 5, options, num, tbi = 0, fileChange = 0,
+    building = 1, vertical = 1, toFile = 1, toConsol = 1;
     /*tbi = tree balance indicator*/
-    /* Options are toFile, toConsol, building, vertical */
+    /* Options are toFile 1***, toConsol *1**, building **1*, vertical ***1 */
 
     /*printf("%d %d %d %d\n", options%10, options%100, options%1000, options%10000);*/
-	do {
-		menuSel = mainMenu();
-
+    do {
 		switch (menuSel) {
 			case 0:                                            /*Clearing tree*/
 			case 4:
@@ -33,9 +33,10 @@ int main(void) {
 				addSel = addMenu();
 
 				if (addSel == 1) {
-					pRoot = addFromFile(pRoot, &tbi, &options);
+					pRoot = addFromFile(pRoot, &tbi, &options, pToFile);
 
 				} else {
+
 					printf("Anna lisättävät luvut: ");
 					pTemp = askNumber();
 					pFree = strtok(pTemp, " ");
@@ -45,9 +46,8 @@ int main(void) {
 						pRoot = addValue(pRoot, num, &tbi);
 						pTemp = strtok(NULL, " ");
 
-                        if ((options % 100) >= 10 ) {
-                            /*Print building if set true*/
-                            printTree(pRoot, 0);
+                        if (building) { /*Print building if set true*/
+                            printController(pRoot, pToFile, toConsol, vertical, 0);
                         }
 
 
@@ -60,8 +60,13 @@ int main(void) {
 				if (pRoot == NULL) {
 					printf("Puu on tyhjä!\n");
 					break;
-				}
-				printTree(pRoot, 0);
+
+                } else if (!toFile && !toConsol) {
+                    printf("Valitse ensin mihin printataan.!\n");
+					break;
+                }
+
+                printController(pRoot, pToFile, toConsol, vertical, 0);
 				printf("\n");
 				break;
 
@@ -91,14 +96,38 @@ int main(void) {
 
             case 5:
                 options = optionsMenu();
+                vertical = options % 10 == 1 ? 1 : 0;
+                building = options % 100 >= 10 ? 1 : 0;
+                toConsol = options % 1000 >= 100 ? 1 : 0;
+                toFile = options % 10000 >= 1000 ? 1 : 0;
+
+                fileChange = toFile == 1 ? 0 : 1;
+
+                if (toFile && !fileChange) {
+                    filename = getFileName();
+
+printf("%s\n", filename);
+
+                    if ((pToFile = fopen(filename, "w")) == NULL) {  /*Open file for writing*/
+                        perror("Opening the file failed.\n");
+                        pToFile = NULL;
+                    }
+                }
+
                 break;
 
 			default:
 				printf("Tuntematon valinta.\n");
 				break;
 		}
+
+        menuSel = mainMenu();
+
 	} while (menuSel != 0);
 
+    if (pToFile) {
+        fclose(pToFile);
+    }
 	printf("Kiitos ohjelman käytöstä.\n");
 	return 0;
 }

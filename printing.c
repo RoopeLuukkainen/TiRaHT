@@ -46,8 +46,6 @@ int addMenu() {
 	fgets(temp, sizeof(temp), stdin);
 	/*sel = (atoi(temp) == 1) ? 1 : 0;*/
 	sel = (atoi(temp));
-	printf("Sel: %d\n", sel);
-
 	return sel;
 }
 
@@ -66,8 +64,8 @@ int optionsMenu() {
     printf("Tulostetaanko tiedostoon? ");
     fgets(toFile, sizeof(toFile), stdin);
 
-    if (strcmp(toFile, "1") || strcmp(toFile, "Y") || strcmp(toFile, "K") ||
-    strcmp(toFile, "y") || strcmp(toFile, "k")) {
+    if (toFile[0] == '1' || toFile[0] == 'Y' || toFile[0] == 'y' ||
+    toFile[0] == 'K' || toFile[0] == 'k') {
 
         result[0] = '1';
     }
@@ -75,8 +73,8 @@ int optionsMenu() {
     printf("Tulostetaanko konsoliin? ");
     fgets(toConsol, sizeof(toConsol), stdin);
 
-    if (strcmp(toConsol, "1") || strcmp(toConsol, "Y") || strcmp(toConsol, "K")
-    || strcmp(toConsol, "y") || strcmp(toConsol, "k")) {
+    if (toConsol[0] == '1' || toConsol[0] == 'Y' || toConsol[0] == 'y' ||
+    toConsol[0] == 'K' || toConsol[0] == 'k') {
 
         result[1] = '1';
     }
@@ -84,17 +82,17 @@ int optionsMenu() {
     printf("Tulostetaanko rakentuminen? ");
 	fgets(building, sizeof(building), stdin);
 
-    if (strcmp(building, "1") || strcmp(building, "Y") || strcmp(building, "K")
-    || strcmp(building, "y") || strcmp(building, "k")) {
+    if (building[0] == '1' || building[0] == 'Y' || building[0] == 'y' ||
+    building[0] == 'K' || building[0] == 'k') {
 
         result[2] = '1';
     }
 
-    printf("Tulostetaanko pystyy(K/Y/1) vai vaakaan (E/N/0)");
+    printf("Tulostetaanko pystyy (K) vai vaakaan (E)? ");
     fgets(vertical, sizeof(vertical), stdin);
 
-    if (strcmp(vertical, "1") || strcmp(vertical, "Y") || strcmp(vertical, "K")
-    || strcmp(vertical, "y") || strcmp(vertical, "k")) {
+    if (vertical[0] == '1' || vertical[0] == 'Y' || vertical[0] == 'y' ||
+    vertical[0] == 'K' || vertical[0] == 'k') {
 
         result[3] = '1';
     }
@@ -109,22 +107,23 @@ int optionsMenu() {
 /****************************PRINTING****************************************************/
 /*Tulostaa jokaisen solmun arvon järjestyksessä: oikea, keski ja vasen.*/
 
-void printTree(tdTree *pRoot, FILE* toFile, int i) {
+void printTree(tdTree *pRoot, FILE* toFile, int toConsol, int i) {
 	i++;
-    printf("%s %d\n", toFile, toFile);
 	if (pRoot != NULL) {
-		printTree(pRoot->pRight, i);
+		printTree(pRoot->pRight, toFile, toConsol, i);
 
-		printf("%*d", i*6, pRoot->iNum);
-		if (pRoot->iBalance == -1) {
-			printf("%c%c%c%c%c\n", 0342, 0201, 0273, 0302, 0271);
+        if (toConsol) {
+    		printf("%*d", i*6, pRoot->iNum);
+    		if (pRoot->iBalance == -1) {
+    			printf("%c%c%c%c%c\n", 0342, 0201, 0273, 0302, 0271);
 
-		} else if (pRoot->iBalance == 1) {
-			printf("%c%c\n", 0302, 0271);
+    		} else if (pRoot->iBalance == 1) {
+    			printf("%c%c\n", 0302, 0271);
 
-		} else {
-			printf("%c%c%c\n", 0342, 0201, 0260);
-		}
+    		} else {
+    			printf("%c%c%c\n", 0342, 0201, 0260);
+    		}
+        }
 
         if (toFile) {
             fprintf(toFile, "%*d", i*6, pRoot->iNum);
@@ -139,6 +138,6 @@ void printTree(tdTree *pRoot, FILE* toFile, int i) {
             }
         }
 
-		printTree(pRoot->pLeft, i);
+		printTree(pRoot->pLeft, toFile, toConsol, i);
 	}
 }
