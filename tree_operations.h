@@ -15,7 +15,7 @@ typedef struct Node tdTree, *tdTreePointer;
 /* Functions */
 void leftRotation (tdTreePointer *, int *);
 void rightRotation (tdTreePointer *, int *);
-tdTree *addValue (tdTree *, int, int *);
+tdTree *addValue (tdTree *, int, int *, int *, int);
 tdTree *searchNumber(tdTree *, int);
 void clearTree(tdTree *);
 

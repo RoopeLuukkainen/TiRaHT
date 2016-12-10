@@ -3,12 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include <math.h>
 
 #include "utils.h"
 #include "tree_operations.h"
 
 /****************************MAIN*MENU*****************************************/
-/*Return number of selection.*/
+/* Return number of menu selection. */
 
 int mainMenu() {
 	int selection;
@@ -32,7 +33,7 @@ int mainMenu() {
 
 
 /****************************ADDING*MENU***************************************/
-/*Return adding type selection.*/
+/* Return adding type selection. */
 
 int addMenu() {
 	int sel = 1;
@@ -50,7 +51,7 @@ int addMenu() {
 }
 
 /****************************PRINTING*MENU*************************************/
-/*Return printing type selections.*/
+/* Return printing type selections. */
 
 int optionsMenu() {
 	int sel;
@@ -104,15 +105,16 @@ int optionsMenu() {
 	return sel;
 }
 
-/****************************PRINTING****************************************************/
-/*Tulostaa jokaisen solmun arvon järjestyksessä: oikea, keski ja vasen.*/
+/****************************PRINTING*HORIZONTAL*******************************/
+/* Print nodes of binary tree postorder, right, node itself and left. */
 
-void printTree(tdTree *pRoot, FILE* toFile, int toConsol, int i) {
+void printTree(tdTree *pRoot, FILE* pToFile, int toConsol, int i) {
 	i++;
 	if (pRoot != NULL) {
-		printTree(pRoot->pRight, toFile, toConsol, i);
+		printTree(pRoot->pRight, pToFile, toConsol, i);
 
         if (toConsol) {
+
     		printf("%*d", i*6, pRoot->iNum);
     		if (pRoot->iBalance == -1) {
     			printf("%c%c%c%c%c\n", 0342, 0201, 0273, 0302, 0271);
@@ -125,19 +127,191 @@ void printTree(tdTree *pRoot, FILE* toFile, int toConsol, int i) {
     		}
         }
 
-        if (toFile) {
-            fprintf(toFile, "%*d", i*6, pRoot->iNum);
+        if (pToFile) {
+            fprintf(pToFile, "%*d", i*6, pRoot->iNum);
             if (pRoot->iBalance == -1) {
-                fprintf(toFile, "%c%c%c%c%c\n", 0342, 0201, 0273, 0302, 0271);
+                fprintf(pToFile, "%c%c%c%c%c\n", 0342, 0201, 0273, 0302, 0271);
 
             } else if (pRoot->iBalance == 1) {
-                fprintf(toFile, "%c%c\n", 0302, 0271);
+                fprintf(pToFile, "%c%c\n", 0302, 0271);
 
             } else {
-                fprintf(toFile, "%c%c%c\n", 0342, 0201, 0260);
+                fprintf(pToFile, "%c%c%c\n", 0342, 0201, 0260);
             }
         }
 
-		printTree(pRoot->pLeft, toFile, toConsol, i);
+		printTree(pRoot->pLeft, pToFile, toConsol, i);
 	}
 }
+
+
+/****************************PRINT*TABS****************************************/
+void printTab(int tab) {
+	int i;
+	for(i = 0; i < tab; i++) {
+		printf("\t");
+	}
+}
+
+/****************************PRINT*LINES***************************************/
+
+void printLines(FILE *pToFile, int toConsol, int *height, int layer, int lineCount) {
+	int i, k, l, j;
+
+	if (pToFile) {
+		for(i = 0; i < (lineCount-1)/2; i++) {
+			fprintf(pToFile, "\t");
+		}
+
+		if(layer < *height) {
+
+			for(k = 0; k < pow(2,layer); k++) {
+				fprintf(pToFile, "  v");									/*oikea reuna*/
+
+				for(l = 0; l <= 4*lineCount + 1; l++) {								/*väliviiva*/
+					fprintf(pToFile, "_");
+				}
+
+				fprintf(pToFile, "-|-");										/*keskimmäinen*/
+
+				for(l = 0; l <= 4*lineCount + 1; l++) {								/*väliviiva*/
+					fprintf(pToFile, "_");
+				}
+
+				fprintf(pToFile, "r  ");									/*vasen reuna*/
+
+				for(j = 0; j <= lineCount; j++) {
+					fprintf(pToFile, "\t");
+				}
+			}
+		}
+	}
+
+	if (toConsol) {
+		for(i = 0; i < (lineCount-1)/2; i++) {
+			printf("\t");
+		}
+
+		if(layer + 1 < *height) {
+
+			for(k = 0; k < pow(2,layer); k++) {
+				printf("  v");									/*oikea reuna*/
+
+				for(l = 0; l <= 4*lineCount + 1; l++) {								/*väliviiva*/
+					printf("_");
+				}
+
+				printf("-|-");										/*keskimmäinen*/
+
+				for(l = 0; l <= 4*lineCount + 1; l++) {								/*väliviiva*/
+					printf("_");
+				}
+
+				printf("r  ");									/*vasen reuna*/
+
+				for(j = 0; j <= lineCount; j++) {
+					printf("\t");
+				}
+			}
+		}
+	}
+}
+
+/****************************PRINTING*LAYER*******************************/
+/* Print one layer of binary tree at the time. Starts at layer 0, the root. */
+
+void printLayer(tdTree *pParent, FILE *pToFile, int toConsol, int *height, int layer, int current, int tabCount) {
+	if (pParent && current == layer) {
+		if (pToFile) {
+    		fprintf(pToFile, "%d", pParent->iNum);
+
+			if (pParent->iBalance == -1) {
+				fprintf(pToFile, "%c%c%c%c%c\t", 0342, 0201, 0273, 0302, 0271);
+
+			} else if (pParent->iBalance == 1) {
+				fprintf(pToFile, "%c%c\t", 0302, 0271);
+
+			} else {
+				fprintf(pToFile, "%c%c%c\t", 0342, 0201, 0260);
+			}
+		}
+
+		if (toConsol) {
+			printTab(tabCount);
+
+			printf("%d", pParent->iNum);
+
+			if (pParent->iBalance == -1) {
+				printf("%c%c%c%c%c\t\t", 0342, 0201, 0273, 0302, 0271);
+
+			} else if (pParent->iBalance == 1) {
+				printf("%c%c\t\t", 0302, 0271);
+
+			} else {
+				printf("%c%c%c\t\t", 0342, 0201, 0260);
+			}
+
+			printTab(tabCount);
+		}
+	} else if (pParent && current < layer) {
+        printLayer(pParent->pLeft, pToFile, toConsol, height, layer, current + 1, tabCount);
+        printLayer(pParent->pRight, pToFile, toConsol, height, layer, current + 1, tabCount);
+
+	} else if (!pParent && current == layer) {
+		if (pToFile) {
+			fprintf(pToFile, "%s\t", "NULL");
+		}
+
+		if (toConsol) {
+			printTab(tabCount);
+			printf("%s\t\t", "NULL");
+			printTab(tabCount);
+		}
+
+	} else if (!pParent && current < layer) {
+		if (pToFile) {
+			fprintf(pToFile, "\t\t\t\t");
+		}
+
+		if (toConsol) {
+			printf("|\t\t\t\t|");
+		}
+	}
+}
+
+/****************************PRINT*CONTROLLER**********************************/
+void printController(tdTree *pRoot, FILE* pToFile, int toConsol, int vertical, int *height, int i) {
+    if (vertical) {
+		int layer, help;
+		for (layer = 0; layer < *height; layer++) {
+			help = (int)pow(2.0, (double)((*height)-layer)) - 1;
+        	printLayer(pRoot, pToFile, toConsol, height, layer, i, help);
+
+			if (toConsol) {
+				printf("\n");
+			}
+			if (pToFile) {
+				fprintf(pToFile, "\n");
+			}
+
+			printLines(pToFile, toConsol, height, layer, help);
+
+			if (toConsol) {
+				printf("\n\n");
+			}
+			if (pToFile) {
+				fprintf(pToFile, "\n\n");
+			}
+		}
+    } else {
+        printTree(pRoot, pToFile, toConsol, i);
+        if (toConsol) {
+            printf("_______________________________________________________\n");
+        }
+        if (pToFile) {
+            fprintf(pToFile, "_______________________________________________________\n");
+        }
+    }
+}
+
+/* EOF */

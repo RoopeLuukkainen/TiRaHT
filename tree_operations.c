@@ -4,7 +4,7 @@
 
 #include "utils.h"
 #include "printing.h"
- 
+
 /****************************LEFT*ROTATION*************************************/
 /*Execute LL or LR rotation depending on tree balance indicator and child nodes
 iBalance number.*/
@@ -14,15 +14,18 @@ void leftRotation (tdTreePointer *pParent, int *tbi) {
     pChild = (*pParent)->pLeft;
 
     if (pChild->iBalance == 1) {                               /* LL-rotation */
-		printf("LL\n");
+		printf("LL\t Vanhempi: %d, lapsi: %d\n", (*pParent)->iNum, pChild->iNum);
         (*pParent)->pLeft = pChild->pRight;
         pChild->pRight = *pParent;
         (*pParent)->iBalance = 0;
         (*pParent) = pChild;
 
     } else {                                                   /* LR-rotation */
-		printf("LR\n");
         pGrandChild = pChild->pRight;
+
+		printf("LR\t Vanhempi: %d, lapsi: %d, lapsenlapsi: %d\n",
+        (*pParent)->iNum, pChild->iNum, pGrandChild->iNum);
+
         pChild->pRight = pGrandChild->pLeft;
         (*pParent)->pLeft = pGrandChild->pRight;
         pGrandChild->pLeft = pChild;
@@ -57,15 +60,18 @@ void rightRotation (tdTreePointer *pParent, int *tbi) {
     pChild = (*pParent)->pRight;
 
     if (pChild->iBalance == -1) {                              /* RR-rotation */
-		printf("RR\n");
+		printf("RR\t Vanhempi: %d, lapsi: %d\n", (*pParent)->iNum, pChild->iNum);
         (*pParent)->pRight = pChild->pLeft;
         pChild->pLeft = *pParent;
         (*pParent)->iBalance = 0;
         (*pParent) = pChild;
 
     } else {                                                   /* RL-rotation */
-		printf("RL\n");
         pGrandChild = pChild->pLeft;
+
+        printf("RL\t Vanhempi: %d, lapsi: %d, lapsenlapsi: %d\n",
+        (*pParent)->iNum, pChild->iNum, pGrandChild->iNum);
+
         pChild->pLeft = pGrandChild->pRight;
         (*pParent)->pRight = pGrandChild->pLeft;
         pGrandChild->pLeft = (*pParent);
@@ -95,8 +101,12 @@ void rightRotation (tdTreePointer *pParent, int *tbi) {
 /* Move recursively along tree and compare current number of node to number
 being added. Allocate memory when find node which == NULL. */
 
-tdTree *addValue (tdTree *pParent, int num, int *tbi) {
+tdTree *addValue (tdTree *pParent, int num, int *tbi, int *height, int current) {
 	tdTree *ptr = NULL;
+
+    *height = *height < current ? current : *height;
+    /* Height keeps track how many layers binary tree has. */
+    current++;
 
 	if (pParent == NULL) {
 		*tbi = 1;
@@ -115,7 +125,7 @@ tdTree *addValue (tdTree *pParent, int num, int *tbi) {
 /*Recursively call function using pRight pointer when current number > new num */
 
 	} else if (num > pParent->iNum) {
-		pParent->pRight = addValue(pParent->pRight, num, tbi);
+		pParent->pRight = addValue(pParent->pRight, num, tbi, height, current);
 
 		if (*tbi) {
 			switch (pParent->iBalance) {
@@ -136,7 +146,7 @@ tdTree *addValue (tdTree *pParent, int num, int *tbi) {
 /*Recursively call function using pLeft pointer when current number < new num */
 
 	} else if (num < pParent->iNum) {
-		pParent->pLeft = addValue(pParent->pLeft, num, tbi);
+		pParent->pLeft = addValue(pParent->pLeft, num, tbi,  height, current);
 
 		if (*tbi) {
 			switch (pParent->iBalance) {
@@ -156,7 +166,7 @@ tdTree *addValue (tdTree *pParent, int num, int *tbi) {
 	} else {
 		*tbi = 0;
         pParent->iCount += 1;
-		printf("Luku %d on jo puussa\n", num);
+		printf("Luku %d on jo puussa, se on esiintynyt %d kertaa.\n", num, pParent->iCount);
 	}
 	return pParent;
 }

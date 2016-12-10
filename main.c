@@ -13,8 +13,8 @@ int main(void) {
 	tdTree *pRoot = NULL, *ptr = NULL;
 	char *pTemp =  NULL, *pFree = NULL, *filename;
     FILE* pToFile = NULL;
-	int addSel, menuSel = 5, options, num, tbi = 0, fileChange = 0,
-    building = 1, vertical = 1, toFile = 1, toConsol = 1;
+	int addSel, menuSel = 5, options, num, tbi = 0, height = 0,
+	fileChange = 0, building = 1, vertical = 1, toFile = 1, toConsol = 1;
     /*tbi = tree balance indicator*/
     /* Options are toFile 1***, toConsol *1**, building **1*, vertical ***1 */
 
@@ -27,13 +27,14 @@ int main(void) {
 					clearTree(pRoot);
 					pRoot = NULL;
 				}
+				height = 0;
 				break;
 
 			case 1:                                            /*Adding number*/
 				addSel = addMenu();
 
 				if (addSel == 1) {
-					pRoot = addFromFile(pRoot, &tbi, &options, pToFile);
+					pRoot = addFromFile(pRoot, &tbi, &height, &options, pToFile);
 
 				} else {
 
@@ -43,13 +44,19 @@ int main(void) {
 
 					do {
 						num = atoi(pTemp);
-						pRoot = addValue(pRoot, num, &tbi);
+						pRoot = addValue(pRoot, num, &tbi, &height, 0);
 						pTemp = strtok(NULL, " ");
 
-                        if (building) { /*Print building if set true*/
-                            printController(pRoot, pToFile, toConsol, vertical, 0);
-                        }
-
+						if (building) {           /*Print building if set true*/
+			                if (toConsol) {
+			                    printf("%d:\n", num);
+			                }
+			                if (toFile) {
+			                    fprintf(pToFile, "%d:\n", num);
+			                }
+							
+			                printController(pRoot, pToFile, toConsol, vertical, &height, 0);
+			            }
 
 					} while (pTemp != NULL);
 					free(pFree);
@@ -66,7 +73,7 @@ int main(void) {
 					break;
                 }
 
-                printController(pRoot, pToFile, toConsol, vertical, 0);
+                printController(pRoot, pToFile, toConsol, vertical, &height, 0);
 				printf("\n");
 				break;
 
@@ -113,6 +120,9 @@ printf("%s\n", filename);
                         pToFile = NULL;
                     }
                 }
+				if (!toFile) {
+					pToFile = NULL;
+				}
 
                 break;
 
@@ -128,6 +138,7 @@ printf("%s\n", filename);
     if (pToFile) {
         fclose(pToFile);
     }
+
 	printf("Kiitos ohjelman käytöstä.\n");
 	return 0;
 }
