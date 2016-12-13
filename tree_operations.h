@@ -1,7 +1,8 @@
+#include "utils.h"
 #ifndef TREE_H
 #define TREE_H
 
-/****************************TIETORAKENNE**************************************/
+/****************************BINARY*TREE*NODE*STRUCT***************************/
 /* Number (key) and pointers to left and right. Also balance indicator and
 count how many times same number appear in tree. */
 

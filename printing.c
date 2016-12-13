@@ -12,7 +12,7 @@
 /* Return number of menu selection. */
 
 int mainMenu() {
-	int selection;
+	int selection = -1;
 	char temp[CHAR_MAX];
 
 	printf ("Valitse toiminto valikosta:\n"
@@ -25,7 +25,16 @@ int mainMenu() {
 			"Valintasi: ");
 
 	fgets(temp, sizeof(temp), stdin);
-	selection = atoi(temp);
+
+	if (strncmp("0", temp, 1) == 0) {
+		selection = 0;
+
+	} else if (atoi(temp)) {
+		selection = atoi(temp);
+
+	} else {
+		selection = -1;
+	}
 	printf("\n");
 
 	return selection;
@@ -141,7 +150,12 @@ void printTree(tdTree *pRoot, FILE* pToFile, int toConsol, int i) {
         }
 
 		printTree(pRoot->pLeft, pToFile, toConsol, i);
-	}
+
+	} /*else {
+		if (toConsol) {
+			printf("%*s\n", i*6 + 1, "NULL");
+		}
+	} */
 }
 
 
@@ -156,7 +170,7 @@ void printTab(int tab) {
 /****************************PRINT*LINES***************************************/
 
 void printLines(FILE *pToFile, int toConsol, int *height, int layer, int lineCount) {
-	int i, k, l, j;
+	int i, k, j;
 
 	if (pToFile) {
 		for(i = 0; i < (lineCount-1)/2; i++) {
@@ -165,22 +179,22 @@ void printLines(FILE *pToFile, int toConsol, int *height, int layer, int lineCou
 
 		if(layer < *height) {
 
-			for(k = 0; k < pow(2,layer); k++) {
-				fprintf(pToFile, "  v");									/*oikea reuna*/
+			for(j = 0; j < pow(2,layer); j++) {
+				fprintf(pToFile, "  %c%c%c", 0342, 0224, 0217);			/* ┏ */		/*vasen reuna*/
 
-				for(l = 0; l <= 4*lineCount + 1; l++) {								/*väliviiva*/
-					fprintf(pToFile, "_");
+				for(k = 0; k <= 4 * lineCount + 1; k++) {								/*väliviiva*/
+					fprintf(pToFile, "%c%c%c", 0342, 0224, 0201); /* ━ */
 				}
 
-				fprintf(pToFile, "-|-");										/*keskimmäinen*/
+				fprintf(pToFile, "%c%c%c", 0342, 0224, 0273); /* ┻ */			/*keskimmäinen*/
 
-				for(l = 0; l <= 4*lineCount + 1; l++) {								/*väliviiva*/
-					fprintf(pToFile, "_");
+				for(k = 0; k <= 4 * lineCount + 1; k++) {								/*väliviiva*/
+					fprintf(pToFile, "%c%c%c", 0342, 0224, 0201); /* ━ */
 				}
 
-				fprintf(pToFile, "r  ");									/*vasen reuna*/
+				fprintf(pToFile, "%c%c%c", 0342, 0224, 0223);			/* ┓ */		/*oikea reuna*/
 
-				for(j = 0; j <= lineCount; j++) {
+				for(i = 0; i <= lineCount; i++) {
 					fprintf(pToFile, "\t");
 				}
 			}
@@ -194,22 +208,22 @@ void printLines(FILE *pToFile, int toConsol, int *height, int layer, int lineCou
 
 		if(layer + 1 < *height) {
 
-			for(k = 0; k < pow(2,layer); k++) {
-				printf("  v");									/*oikea reuna*/
+			for(j = 0; j < pow(2,layer); j++) {
+				printf("  %c%c%c", 0342, 0224, 0217);			/* ┏ */						/*vasen reuna*/
 
-				for(l = 0; l <= 4*lineCount + 1; l++) {								/*väliviiva*/
-					printf("_");
+				for(k = 0; k <= 4 * lineCount + 1; k++) {								/*väliviiva*/
+					printf("%c%c%c", 0342, 0224, 0201); /* ━ */
 				}
 
-				printf("-|-");										/*keskimmäinen*/
+				printf("%c%c%c", 0342, 0224, 0273); /* ┻ */										/*keskimmäinen*/
 
-				for(l = 0; l <= 4*lineCount + 1; l++) {								/*väliviiva*/
-					printf("_");
+				for(k = 0; k <= 4 * lineCount + 1; k++) {								/*väliviiva*/
+					printf("%c%c%c", 0342, 0224, 0201); /* ━ */
 				}
 
-				printf("r  ");									/*vasen reuna*/
+				printf("%c%c%c", 0342, 0224, 0223);			/* ┓ */										/*oikea reuna*/
 
-				for(j = 0; j <= lineCount; j++) {
+				for(i = 0; i <= lineCount; i++) {
 					printf("\t");
 				}
 			}

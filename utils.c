@@ -14,7 +14,7 @@ tdTree *addFromFile(tdTree *pRoot, int *tbi, int *height, int *options, FILE* pT
 	tdTree *ptr = pRoot;
 	FILE* pFile;
 	char line[CHAR_MAX], filename[CHAR_MAX];
-    int building, vertical, toConsol;
+    int building, vertical, toConsol, num = 0, temp = 0;
 
     vertical = *options % 10 == 1 ? 1 : 0;
     building = *options % 100 >= 10 ? 1 : 0;
@@ -28,17 +28,34 @@ tdTree *addFromFile(tdTree *pRoot, int *tbi, int *height, int *options, FILE* pT
 	if ((pFile = fopen(filename, "r")) != NULL) {
 		while (fgets(line, sizeof(line), pFile) != NULL) {
 			/*printf("Luku: %s", line);*/
-			ptr = addValue(ptr, atoi(line), tbi, height, 0); /* CHECKING THE VALUES!!! */
 
-            if (building) {                      /*Print building if set true*/
-                if (toConsol) {
-                    printf("%d:\n", atoi(line));
-                }
-                if (pToFile) {
-                    fprintf(pToFile, "%d:\n", atoi(line));
-                }
-                printController(ptr, pToFile, toConsol, vertical, height, 0);
-            }
+			if (strncmp("0", line, 1) == 0) {
+				temp = 1;
+
+			}
+
+			if (atoi(line) || temp) {
+				if (temp) {
+					num = 0;
+					temp = 0;
+
+				} else {
+				num = atoi(line);
+
+				}
+				ptr = addValue(ptr, num, tbi, height, 0);
+
+				if (building) {       /*Print building if set true*/
+					if (toConsol) {
+						printf("%d:\n", num);
+					}
+					if (pToFile) {
+						fprintf(pToFile, "%d:\n", num);
+					}
+
+					printController(ptr, pToFile, toConsol, vertical, height, 0);
+				}
+			}
 		}
 
 	} else {

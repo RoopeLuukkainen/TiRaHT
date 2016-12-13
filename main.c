@@ -11,55 +11,75 @@
 
 int main(void) {
 	tdTree *pRoot = NULL, *ptr = NULL;
-	char *pTemp =  NULL, *pFree = NULL, *filename;
+	char *pTemp =  NULL, *pFree = NULL, *pFilename;
     FILE* pToFile = NULL;
-	int addSel, menuSel = 5, options, num, tbi = 0, height = 0,
-	fileChange = 0, building = 1, vertical = 1, toFile = 1, toConsol = 1;
+	int iAddSel, iMenuSel = 5, options = 111, iNum, temp = 0, tbi = 0, iHeight = 0,
+	fileChange = 0, building = 1, vertical = 1, toFile = 0, toConsol = 1;
     /*tbi = tree balance indicator*/
     /* Options are toFile 1***, toConsol *1**, building **1*, vertical ***1 */
 
     /*printf("%d %d %d %d\n", options%10, options%100, options%1000, options%10000);*/
+
     do {
-		switch (menuSel) {
+        iMenuSel = mainMenu();
+		switch (iMenuSel) {
 			case 0:                                            /*Clearing tree*/
 			case 4:
 				if (pRoot != NULL) {
 					clearTree(pRoot);
 					pRoot = NULL;
+					printf("%s\n", "Muisti vapautettu!");
 				}
-				height = 0;
+				iHeight = 0;
 				break;
 
 			case 1:                                            /*Adding number*/
-				addSel = addMenu();
+				iAddSel = addMenu();
 
-				if (addSel == 1) {
-					pRoot = addFromFile(pRoot, &tbi, &height, &options, pToFile);
+				if (iAddSel == 1) {
+					pRoot = addFromFile(pRoot, &tbi, &iHeight, &options, pToFile);
 
 				} else {
 
 					printf("Anna lisättävät luvut: ");
 					pTemp = askNumber();
-					pFree = strtok(pTemp, " ");
+					pFree = pTemp;
 
 					do {
-						num = atoi(pTemp);
-						pRoot = addValue(pRoot, num, &tbi, &height, 0);
+						if (strncmp("0", pTemp, 1) == 0) {
+							temp = 1;
+							printf("%s %s\n", "PÖÖ", pTemp);
+						}
+
+						if (atoi(pTemp) || temp) {
+							if (temp) {
+								iNum = 0;
+								temp = 0;
+
+							} else {
+								iNum = atoi(pTemp);
+							}
+							pRoot = addValue(pRoot, iNum, &tbi, &iHeight, 0);
+
+							if (building) {       /*Print building if set true*/
+				                if (toConsol) {
+				                    printf("%d:\n", iNum);
+				                }
+				                if (toFile) {
+				                    fprintf(pToFile, "%d:\n", iNum);
+				                }
+
+				                printController(pRoot, pToFile, toConsol, vertical, &iHeight, 0);
+				            }
+						}
+
 						pTemp = strtok(NULL, " ");
 
-						if (building) {           /*Print building if set true*/
-			                if (toConsol) {
-			                    printf("%d:\n", num);
-			                }
-			                if (toFile) {
-			                    fprintf(pToFile, "%d:\n", num);
-			                }
-							
-			                printController(pRoot, pToFile, toConsol, vertical, &height, 0);
-			            }
-
 					} while (pTemp != NULL);
-					free(pFree);
+
+					if (pFree) {
+						free(pFree);
+					}
 				}
 				break;
 
@@ -73,7 +93,7 @@ int main(void) {
 					break;
                 }
 
-                printController(pRoot, pToFile, toConsol, vertical, &height, 0);
+                printController(pRoot, pToFile, toConsol, vertical, &iHeight, 0);
 				printf("\n");
 				break;
 
@@ -83,22 +103,39 @@ int main(void) {
 				pFree = strtok(pTemp, " ");
 
 				do {
-					num = atoi(pTemp);
-					ptr = searchNumber(pRoot, num);
-
-					if (ptr == NULL) {
-						printf("Lukua %d ei löytynyt puusta.\n", num);
-
-					} else {
-						printf("%d löytyi binääripuusta.\n", ptr->iNum);
-
+					if (strncmp("0", pTemp, 1) == 0) {
+						temp = 1;
+						printf("%s %s\n", "PÖÖ", pTemp);
 					}
+
+					if (atoi(pTemp) || temp) {
+						if (temp) {
+							iNum = 0;
+							temp = 0;
+
+						} else {
+							iNum = atoi(pTemp);
+						}
+						ptr = searchNumber(pRoot, iNum);
+
+						if (ptr == NULL) {
+							printf("Lukua %d ei löytynyt puusta.\n\n", iNum);
+
+						} else {
+							printf("\n%d löytyi binääripuusta. Se on esiintynyt: %d kertaa.\n\n",
+							 ptr->iNum, ptr->iCount);
+
+						}
+					}
+
 					pTemp = strtok(NULL, " ");
 
 				} while (pTemp != NULL);
 
 				printf("\n");
-				free(pFree);
+				if (pFree) {
+					free(pFree);
+				}
 				break;
 
             case 5:
@@ -111,11 +148,11 @@ int main(void) {
                 fileChange = toFile == 1 ? 0 : 1;
 
                 if (toFile && !fileChange) {
-                    filename = getFileName();
+                    pFilename = getFileName();
 
-printf("%s\n", filename);
+printf("%s\n", pFilename);
 
-                    if ((pToFile = fopen(filename, "w")) == NULL) {  /*Open file for writing*/
+                    if ((pToFile = fopen(pFilename, "w")) == NULL) {  /*Open file for writing*/
                         perror("Opening the file failed.\n");
                         pToFile = NULL;
                     }
@@ -131,12 +168,11 @@ printf("%s\n", filename);
 				break;
 		}
 
-        menuSel = mainMenu();
-
-	} while (menuSel != 0);
+	} while (iMenuSel != 0);
 
     if (pToFile) {
         fclose(pToFile);
+		free(pFilename);
     }
 
 	printf("Kiitos ohjelman käytöstä.\n");

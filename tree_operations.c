@@ -102,7 +102,7 @@ void rightRotation (tdTreePointer *pParent, int *tbi) {
 being added. Allocate memory when find node which == NULL. */
 
 tdTree *addValue (tdTree *pParent, int num, int *tbi, int *height, int current) {
-	tdTree *ptr = NULL;
+	tdTree *ptr;
 
     *height = *height < current ? current : *height;
     /* Height keeps track how many layers binary tree has. */
@@ -179,19 +179,23 @@ number in tree and return NULL. */
 
 tdTree *searchNumber(tdTree *pRoot, int num) {
 	tdTree *ptr = pRoot;
+    printf("Etsittävä luku: %d\n", num);
 
 	while (ptr != NULL)	 {
+        printf("Solmun luku: %d", ptr->iNum);
 		if (num == ptr->iNum) {
 			return ptr;
 
-		} else if (num > pRoot->iNum) {
+		} else if (num > ptr->iNum) {
+            printf(" < %d eli -> oikealle.\n", num);
 			ptr = ptr->pRight;
 
-		} else if (num < pRoot->iNum) {
+		} else if (num < ptr->iNum) {
+            printf(" > %d eli -> vasemmalle.\n", num);
 			ptr = ptr->pLeft;
 		}
 	}
-	return NULL;
+	return ptr; /* PTR is null if this part is reached */
 }
 
 /****************************CLEARING******************************************/
@@ -202,6 +206,7 @@ void clearTree(tdTree *pRoot) {
 		clearTree(pRoot->pRight);
 		clearTree(pRoot->pLeft);
 		pRoot->pLeft = pRoot->pRight = NULL;
+/* printf("%d vapautettu\n", pRoot->iNum); */
 		free(pRoot);
 	}
 }
