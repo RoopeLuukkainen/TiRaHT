@@ -1,4 +1,3 @@
-#include "utils.h"
 #ifndef TREE_H
 #define TREE_H
 
@@ -13,10 +12,18 @@ struct Node {
 };
 typedef struct Node tdTree, *tdTreePointer;
 
+/****************************OPSTIONS*STRUCT***************************/
+/* Value = 1 if option is selected == it's ON and 0 == OFF */
+
+struct Struct {
+    short bConsol, bFile, bBuilding, bVertical;
+};
+typedef struct Struct tdOptions, *tdOptionsPointer;
+
 /* Functions */
 void leftRotation (tdTreePointer *, int *);
 void rightRotation (tdTreePointer *, int *);
-tdTree *addValue (tdTree *, int, int *, int *, int);
+tdTree *addValue (tdTree *, tdOptions *, int, int *, int *, int);
 tdTree *searchNumber(tdTree *, int);
 void clearTree(tdTree *);
 

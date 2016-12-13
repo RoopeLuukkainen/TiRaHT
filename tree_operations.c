@@ -7,7 +7,7 @@
 
 /****************************LEFT*ROTATION*************************************/
 /*Execute LL or LR rotation depending on tree balance indicator and child nodes
-iBalance number.*/
+iBalance number. Very much like example of week 9 exercise 1 from TiRa-course */
 
 void leftRotation (tdTreePointer *pParent, int *tbi) {
     tdTreePointer pChild, pGrandChild;
@@ -53,7 +53,7 @@ void leftRotation (tdTreePointer *pParent, int *tbi) {
 
 /****************************RIGHT*ROTATION************************************/
 /*Execute RR or RL rotation depending on tree balance indicator and child nodes
-iBalance number.*/
+iBalance number. Very much like example of week 9 exercise 1 from TiRa-course */
 
 void rightRotation (tdTreePointer *pParent, int *tbi) {
     tdTreePointer pChild, pGrandChild;
@@ -101,12 +101,12 @@ void rightRotation (tdTreePointer *pParent, int *tbi) {
 /* Move recursively along tree and compare current number of node to number
 being added. Allocate memory when find node which == NULL. */
 
-tdTree *addValue (tdTree *pParent, int num, int *tbi, int *height, int current) {
+tdTree *addValue (tdTree *pParent, tdOptions *pOpt, int num, int *tbi, int *height, int current) {
 	tdTree *ptr;
 
+    current++;
     *height = *height < current ? current : *height;
     /* Height keeps track how many layers binary tree has. */
-    current++;
 
 	if (pParent == NULL) {
 		*tbi = 1;
@@ -125,7 +125,7 @@ tdTree *addValue (tdTree *pParent, int num, int *tbi, int *height, int current) 
 /*Recursively call function using pRight pointer when current number > new num */
 
 	} else if (num > pParent->iNum) {
-		pParent->pRight = addValue(pParent->pRight, num, tbi, height, current);
+		pParent->pRight = addValue(pParent->pRight, pOpt, num, tbi, height, current);
 
 		if (*tbi) {
 			switch (pParent->iBalance) {
@@ -146,7 +146,7 @@ tdTree *addValue (tdTree *pParent, int num, int *tbi, int *height, int current) 
 /*Recursively call function using pLeft pointer when current number < new num */
 
 	} else if (num < pParent->iNum) {
-		pParent->pLeft = addValue(pParent->pLeft, num, tbi,  height, current);
+		pParent->pLeft = addValue(pParent->pLeft, pOpt, num, tbi,  height, current);
 
 		if (*tbi) {
 			switch (pParent->iBalance) {
@@ -166,7 +166,9 @@ tdTree *addValue (tdTree *pParent, int num, int *tbi, int *height, int current) 
 	} else {
 		*tbi = 0;
         pParent->iCount += 1;
-		printf("Luku %d on jo puussa, se on esiintynyt %d kertaa.\n", num, pParent->iCount);
+        if (pOpt->bBuilding && pOpt->bConsol) {
+                printf("Luku %d on jo puussa, se on esiintynyt %d kertaa.\n", num, pParent->iCount);
+        }
 	}
 	return pParent;
 }

@@ -3,9 +3,10 @@
 
 int mainMenu();
 int addMenu();
-int optionsMenu();
-void printTree(tdTree *, FILE *, int, int);
-void printLines(FILE *, int, int *, int, int);
-void printTab(int);
-void printLayer(tdTree *, FILE *, int, int *, int, int, int);
-void printController(tdTree *, FILE *, int, int, int *, int);
+void printOptions(tdOptions *);
+void optionsMenu(tdOptionsPointer *);
+void printTree(tdTree *, FILE *, tdOptions *, int);
+void printLines(FILE *, tdOptions *, int *, int, int);
+void printTab(int, FILE *, tdOptions *);
+void printLayer(tdTree *, FILE *, tdOptions *, int *, int, int, int);
+void printController(tdTree *, FILE *, tdOptions *, int *, int);

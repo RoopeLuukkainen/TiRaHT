@@ -6,20 +6,34 @@
 #include "printing.h"
 #include "tree_operations.h"
 
+/****************************SET*UP*OPTIONS************************************/
+/* Initialize options at beginning of run. */
+
+tdOptions *setUpOptions(tdOptions *pOpt) {
+	tdOptions *tempOpt = NULL;
+	if ((tempOpt = (tdOptions*)malloc(sizeof(tdOptions))) == NULL) { /*Memory allocation*/
+		perror("Muistinvaraus epäonnistui );\n");
+		exit(1);
+	}
+
+	tempOpt->bConsol = tempOpt->bBuilding = 1;
+	tempOpt->bFile = tempOpt->bVertical = 0;
+
+	pOpt = tempOpt;
+	printOptions(pOpt);
+
+	return pOpt;
+}
+
 /****************************FROM*FILE*ADDING**********************************/
 /* Ask filename and read file. Numbers in file are added to the tree in same
 order than they appear in file. */
 
-tdTree *addFromFile(tdTree *pRoot, int *tbi, int *height, int *options, FILE* pToFile) {
+tdTree *addFromFile(tdTree *pRoot, int *tbi, int *height, tdOptions *pOpt, FILE* pToFile) {
 	tdTree *ptr = pRoot;
 	FILE* pFile;
 	char line[CHAR_MAX], filename[CHAR_MAX];
-    int building, vertical, toConsol, num = 0, temp = 0;
-
-    vertical = *options % 10 == 1 ? 1 : 0;
-    building = *options % 100 >= 10 ? 1 : 0;
-    toConsol = *options % 1000 >= 100 ? 1 : 0;
-
+    int num = 0, temp = 0;
 
     printf("Anna luettavan tiedoston nimi: ");
     fgets(filename, sizeof(filename), stdin);
@@ -43,19 +57,27 @@ tdTree *addFromFile(tdTree *pRoot, int *tbi, int *height, int *options, FILE* pT
 				num = atoi(line);
 
 				}
-				ptr = addValue(ptr, num, tbi, height, 0);
+				ptr = addValue(ptr, pOpt, num, tbi, height, 0);
 
-				if (building) {       /*Print building if set true*/
-					if (toConsol) {
+				if (pOpt->bBuilding) {       	  /*Print building if set true*/
+					if (pOpt->bConsol) {
 						printf("%d:\n", num);
 					}
-					if (pToFile) {
+					if (pOpt->bFile) {
 						fprintf(pToFile, "%d:\n", num);
 					}
 
-					printController(ptr, pToFile, toConsol, vertical, height, 0);
+					printController(ptr, pToFile, pOpt, height, 0);
 				}
 			}
+		}
+
+		if (pOpt->bFile) {
+			fprintf(pToFile, "\n\n\n\n");
+		}
+
+		if (pOpt->bConsol) {
+			printf("\n\n\n");
 		}
 
 	} else {

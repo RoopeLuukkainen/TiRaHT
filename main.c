@@ -11,14 +11,13 @@
 
 int main(void) {
 	tdTree *pRoot = NULL, *ptr = NULL;
+	tdOptions *pOpt = NULL;
 	char *pTemp =  NULL, *pFree = NULL, *pFilename;
     FILE* pToFile = NULL;
-	int iAddSel, iMenuSel = 5, options = 111, iNum, temp = 0, tbi = 0, iHeight = 0,
-	fileChange = 0, building = 1, vertical = 1, toFile = 0, toConsol = 1;
-    /*tbi = tree balance indicator*/
-    /* Options are toFile 1***, toConsol *1**, building **1*, vertical ***1 */
+	int iAddSel, iMenuSel, iNum, temp = 0, tbi = 0, iHeight = 0, fileChange = 0;
+	/*tbi = tree balance indicator*/
 
-    /*printf("%d %d %d %d\n", options%10, options%100, options%1000, options%10000);*/
+	pOpt = setUpOptions(pOpt);
 
     do {
         iMenuSel = mainMenu();
@@ -28,7 +27,7 @@ int main(void) {
 				if (pRoot != NULL) {
 					clearTree(pRoot);
 					pRoot = NULL;
-					printf("%s\n", "Muisti vapautettu!");
+					printf("%s\n", "Muisti vapautettu puusta!");
 				}
 				iHeight = 0;
 				break;
@@ -37,18 +36,17 @@ int main(void) {
 				iAddSel = addMenu();
 
 				if (iAddSel == 1) {
-					pRoot = addFromFile(pRoot, &tbi, &iHeight, &options, pToFile);
+					pRoot = addFromFile(pRoot, &tbi, &iHeight, pOpt, pToFile);
 
 				} else {
 
 					printf("Anna lisättävät luvut: ");
 					pTemp = askNumber();
-					pFree = pTemp;
-
+					pFree = strtok(pTemp, " ");
 					do {
+
 						if (strncmp("0", pTemp, 1) == 0) {
 							temp = 1;
-							printf("%s %s\n", "PÖÖ", pTemp);
 						}
 
 						if (atoi(pTemp) || temp) {
@@ -59,17 +57,17 @@ int main(void) {
 							} else {
 								iNum = atoi(pTemp);
 							}
-							pRoot = addValue(pRoot, iNum, &tbi, &iHeight, 0);
+							pRoot = addValue(pRoot, pOpt, iNum, &tbi, &iHeight, 0);
 
-							if (building) {       /*Print building if set true*/
-				                if (toConsol) {
+							if (pOpt->bBuilding) {/*Print building if set true*/
+				                if (pOpt->bConsol) {
 				                    printf("%d:\n", iNum);
 				                }
-				                if (toFile) {
+				                if (pOpt->bFile) {
 				                    fprintf(pToFile, "%d:\n", iNum);
 				                }
 
-				                printController(pRoot, pToFile, toConsol, vertical, &iHeight, 0);
+				                printController(pRoot, pToFile, pOpt, &iHeight, 0);
 				            }
 						}
 
@@ -88,12 +86,12 @@ int main(void) {
 					printf("Puu on tyhjä!\n");
 					break;
 
-                } else if (!toFile && !toConsol) {
+                } else if (!(pOpt->bFile) && !(pOpt->bConsol)) {
                     printf("Valitse ensin mihin printataan.!\n");
 					break;
                 }
 
-                printController(pRoot, pToFile, toConsol, vertical, &iHeight, 0);
+                printController(pRoot, pToFile, pOpt, &iHeight, 0);
 				printf("\n");
 				break;
 
@@ -101,11 +99,9 @@ int main(void) {
 				printf("Anna etsittävät luvut: ");
 				pTemp = askNumber();
 				pFree = strtok(pTemp, " ");
-
 				do {
 					if (strncmp("0", pTemp, 1) == 0) {
 						temp = 1;
-						printf("%s %s\n", "PÖÖ", pTemp);
 					}
 
 					if (atoi(pTemp) || temp) {
@@ -139,26 +135,25 @@ int main(void) {
 				break;
 
             case 5:
-                options = optionsMenu();
-                vertical = options % 10 == 1 ? 1 : 0;
-                building = options % 100 >= 10 ? 1 : 0;
-                toConsol = options % 1000 >= 100 ? 1 : 0;
-                toFile = options % 10000 >= 1000 ? 1 : 0;
+                optionsMenu(&pOpt);
 
-                fileChange = toFile == 1 ? 0 : 1;
+                fileChange = pOpt->bFile == 1 ? 0 : 1;
 
-                if (toFile && !fileChange) {
+                if (pOpt->bFile && !fileChange) {
                     pFilename = getFileName();
-
-printf("%s\n", pFilename);
 
                     if ((pToFile = fopen(pFilename, "w")) == NULL) {  /*Open file for writing*/
                         perror("Opening the file failed.\n");
                         pToFile = NULL;
                     }
+					fprintf(pToFile, "BINÄÄRIPUU\n");
                 }
-				if (!toFile) {
-					pToFile = NULL;
+				if (!(pOpt->bFile)) {
+					if (pToFile) {
+						fclose(pToFile);
+						pToFile = NULL;
+						free(pFilename);
+					}
 				}
 
                 break;
@@ -174,6 +169,8 @@ printf("%s\n", pFilename);
         fclose(pToFile);
 		free(pFilename);
     }
+
+	free(pOpt);
 
 	printf("Kiitos ohjelman käytöstä.\n");
 	return 0;
