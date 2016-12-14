@@ -14,7 +14,7 @@
 int main(void) {
 	tdTree *pRoot = NULL, *ptr = NULL;
 	tdOptions *pOpt = NULL;
-	char *pTemp =  NULL, *pFree = NULL, *pFilename;
+	char *pTemp =  NULL, *pFree = NULL, *pFilename = NULL;
     FILE* pToFile = NULL;
 	int iAddSel, iMenuSel, iNum, temp = 0, tbi = 0, iHeight = 0, fileChange = 0;
 	/*tbi = tree balance indicator*/
