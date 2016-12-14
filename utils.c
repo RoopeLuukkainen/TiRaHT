@@ -37,25 +37,24 @@ tdTree *addFromFile(tdTree *pRoot, int *tbi, int *height, tdOptions *pOpt, FILE*
 
     printf("Anna luettavan tiedoston nimi: ");
     fgets(filename, sizeof(filename), stdin);
-    filename[strlen(filename) - 1] = '\0';
+    filename[strlen(filename) - 1] = '\0';  /* Changes \n to '\0' so filename is correct.*/
 
-	if ((pFile = fopen(filename, "r")) != NULL) {
-		while (fgets(line, sizeof(line), pFile) != NULL) {
+	if ((pFile = fopen(filename, "r")) != NULL) { /* Check if file opening succees. */
+		while (fgets(line, sizeof(line), pFile) != NULL) { /* Read file one line at the time. */
 			/*printf("Luku: %s", line);*/
 
 			if (strncmp("0", line, 1) == 0) {
+				/* Check if string first character is 0 and then assume wanted number is 0 .*/
 				temp = 1;
-
 			}
 
-			if (atoi(line) || temp) {
+			if (atoi(line) || temp) { /*Atoi("0") = 0 so temp is used to tell number is 0.*/
 				if (temp) {
 					num = 0;
 					temp = 0;
 
 				} else {
-				num = atoi(line);
-
+					num = atoi(line); /* When line is number but not 0 it's changed normally to integer. */
 				}
 				ptr = addValue(ptr, pOpt, num, tbi, height, 0);
 
@@ -80,14 +79,14 @@ tdTree *addFromFile(tdTree *pRoot, int *tbi, int *height, tdOptions *pOpt, FILE*
 			printf("\n\n\n");
 		}
 
-	} else {
+	} else { /* If file opening fails returns to menu with original root node. */
         perror("Tiedostonluku epäonnistui, "
          "ole hyvä ja tarkista että hakemasi tiedosto on olemassa.\n");
 		return pRoot;
 	}
 
-	fclose(pFile);
-	return ptr;
+	fclose(pFile); 										 /* Closes read file. */
+	return ptr; 									 /* Return new root node. */
 }
 
 /****************************ASKING*NUMBER*************************************/
@@ -95,7 +94,7 @@ tdTree *addFromFile(tdTree *pRoot, int *tbi, int *height, tdOptions *pOpt, FILE*
 
 char *askNumber() {
 	char temp [255];
-	char *pTemp = malloc(255 * sizeof(char));
+	char *pTemp = malloc(255 * sizeof(char)); /* Memory allcation to 255 char. */
 
     fgets(temp, sizeof(temp), stdin);
 	strcpy(pTemp, temp);
@@ -105,13 +104,13 @@ char *askNumber() {
 
 /****************************GET*FILE******************************************/
 char *getFileName() {
-    char name[CHAR_MAX], *pName = malloc(sizeof(CHAR_MAX));
+    char name[CHAR_MAX], *pName = malloc(sizeof(name));  /* Memory allcation. */
 
     printf("Anna kirjoitettavan tiedoston nimi: ");
     fgets(name, sizeof(name), stdin);
-    name[strlen(name) - 1] = '\0';
+    name[strlen(name) - 1] = '\0'; /* Changes \n to '\0' so filename is correct.*/
 
-	strcpy(pName, name);
+	strcpy(pName, name); /* Copy string to pointer which is then returned. */
     return pName;
 }
 

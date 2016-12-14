@@ -21,8 +21,8 @@ struct Struct {
 typedef struct Struct tdOptions, *tdOptionsPointer;
 
 /* Functions */
-void leftRotation (tdTreePointer *, int *);
-void rightRotation (tdTreePointer *, int *);
+void leftRotation (tdTreePointer *, int *, tdOptions *);
+void rightRotation (tdTreePointer *, int *, tdOptions *);
 tdTree *addValue (tdTree *, tdOptions *, int, int *, int *, int);
 tdTree *searchNumber(tdTree *, int);
 void clearTree(tdTree *);

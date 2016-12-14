@@ -12,7 +12,7 @@
 /* Return number of menu selection. */
 
 int mainMenu() {
-	int selection = -1;
+	int selection = -1; /* -1 represent invalid selection. Which will be changed only when user input is integer. */
 	char temp[CHAR_MAX];
 
 	printf ("Valitse toiminto valikosta:\n"
@@ -27,16 +27,14 @@ int mainMenu() {
 	fgets(temp, sizeof(temp), stdin);
 
 	if (strncmp("0", temp, 1) == 0) {
+		/* Check if string first character is 0 and then assume wanted number is 0 .*/
 		selection = 0;
 
-	} else if (atoi(temp)) {
+	} else if (atoi(temp)) { /* When input is integer -> selection is set to be this integer. */
 		selection = atoi(temp);
-
-	} else {
-		selection = -1;
 	}
-	printf("\n");
 
+	printf("\n");
 	return selection;
 }
 
@@ -60,6 +58,7 @@ int addMenu() {
 }
 
 /****************************OPTIONS*PRINT*************************************/
+/* Prints options and each option's value. 1 =´means ON and 0 menas OFF.*/
 
 void printOptions(tdOptions *pOpt) {
 	printf("Asetukset ovat:\n"
@@ -67,6 +66,7 @@ void printOptions(tdOptions *pOpt) {
 	"Konsoliin tulostus:\t%d\n"
 	"Rakentumisen tulostus:\t%d\n"
 	"Pystyyn tulostus:\t%d\n\n", pOpt->bFile, pOpt->bConsol, pOpt->bBuilding, pOpt->bVertical);
+	/* OFF version of vertical is horizontal printing. */
 }
 
 /****************************OPTIONS*MENU**************************************/
@@ -82,6 +82,8 @@ void optionsMenu(tdOptionsPointer *pOpt) {
 	}*/
 
     printf("Vastausformaatti: [Y/N] tai [K/E] /tai [1/0]\n\n");
+	/* Code checks 1, Y, y, K and k. If one of them is selected value == 1.
+	Every other situations makes selection to be 0 which means OFF. */
 
     printf("Tulostetaanko tiedostoon? ");
     fgets(temp, sizeof(temp), stdin);
@@ -131,7 +133,7 @@ void optionsMenu(tdOptionsPointer *pOpt) {
 		(*pOpt)->bVertical = 0;
 	}
 
-	printOptions(*pOpt);
+	printOptions(*pOpt); /* Lastly prints set options. */
 }
 
 /****************************PRINTING*HORIZONTAL*******************************/
@@ -143,7 +145,7 @@ void printTree(tdTree *pRoot, FILE* pToFile, tdOptions *pOpt, int i) {
 		printTree(pRoot->pRight, pToFile, pOpt, i);
 
         if (pOpt->bConsol) {
-
+			/*Prints number and then to superscipt its balance indicator using UTF-8 escape sequences. */
     		printf("%*d", i*6, pRoot->iNum);
 			if (pRoot->iBalance == -1) {
 				printf("%s\n", "\xe2\x82\x8b\xc2\xb9"); /*printf("%c%c%c%c%c\t\t", 0342, 0201, 0273, 0302, 0271);*/
@@ -184,26 +186,29 @@ void printTree(tdTree *pRoot, FILE* pToFile, tdOptions *pOpt, int i) {
 
 
 /****************************PRINT*TABS****************************************/
+/* Prints given amount of tabulators. */
 void printTab(int tab, FILE *pToFile, tdOptions *pOpt) {
 	int i;
 	if (pOpt->bFile) {
-		for (i = 0; i < tab; i++) {
+		for (i = 0; i < tab/2; i++) {
 			fprintf(pToFile, "\t");
 		}
 	}
 
 	if (pOpt->bConsol) {
-		for(i = 0; i < tab; i++) {
+		for(i = 0; i < tab/2; i++) {
 			printf("\t");
 		}
 	}
 }
 
 /****************************PRINT*LINES***************************************/
+/* Prints lines between layers of vertical printed tree using UTF-8 escape sequences.
+Used lines are box drawing charactes. ┏ ━ ┻ ━ ┓ */
 
 void printLines(FILE *pToFile, tdOptions *pOpt, int *height, int layer, int lineCount) {
 	int i, k, j;
-
+if (layer != *height-1) {
 	if (pOpt->bFile) {
 		for(i = 0; i < (lineCount-1)/2; i++) {
 			fprintf(pToFile, "\t");
@@ -262,13 +267,16 @@ void printLines(FILE *pToFile, tdOptions *pOpt, int *height, int layer, int line
 		}
 	}
 }
+}
 
 /****************************PRINTING*LAYER*******************************/
 /* Print one layer of binary tree at the time. Starts at layer 0, the root. */
 
 void printLayer(tdTree *pParent, FILE *pToFile, tdOptions *pOpt, int *height, int layer, int current, int tabCount) {
-	if (pParent && current == layer) {
+	if (pParent && current == layer) { /* When are in right layer and node exist. */
 		printTab(tabCount, pToFile, pOpt);
+
+/*Prints number and then to superscipt its balance indicator using UTF-8 escape sequences. */
 
 		if (pOpt->bFile) {
     		fprintf(pToFile, "%d", pParent->iNum);
@@ -300,11 +308,11 @@ void printLayer(tdTree *pParent, FILE *pToFile, tdOptions *pOpt, int *height, in
 		}
 		printTab(tabCount, pToFile, pOpt);
 
-	} else if (pParent && current < layer) {
+	} else if (pParent && current < layer) { /* When are in too low layer and node exist. */
         printLayer(pParent->pLeft, pToFile, pOpt, height, layer, current + 1, tabCount);
         printLayer(pParent->pRight, pToFile, pOpt, height, layer, current + 1, tabCount);
 
-	} else if (!pParent && current == layer) {
+	} else if (!pParent && current == layer) { /* When are in right layer but node don't exist. */
 		printTab(tabCount, pToFile, pOpt);
 
 		if (pOpt->bFile) {
@@ -317,7 +325,7 @@ void printLayer(tdTree *pParent, FILE *pToFile, tdOptions *pOpt, int *height, in
 
 		printTab(tabCount, pToFile, pOpt);
 
-	} else if (!pParent && current < layer) {
+	} else if (!pParent && current < layer) { /* When are in too low layer and node don't exist. */
 		if (pOpt->bFile) {
 			fprintf(pToFile, "\t\t\t\t");
 		}
@@ -329,11 +337,13 @@ void printLayer(tdTree *pParent, FILE *pToFile, tdOptions *pOpt, int *height, in
 }
 
 /****************************PRINT*CONTROLLER**********************************/
+/* Controls what is printed and where depending on options. */
 void printController(tdTree *pRoot, FILE* pToFile, tdOptions *pOpt, int *height, int i) {
-    if (pOpt->bVertical) {
+
+    if (pOpt->bVertical) { /* Print vertical if it's set ON. */
 		int layer, help;
 
-		for (layer = 0; layer < *height; layer++) {
+		for (layer = 0; layer < *height; layer++) { /* Goes trought tree one layer at the time. */
 			help = (int)pow(2.0, (double)((*height)-layer)) - 1;
 
         	printLayer(pRoot, pToFile, pOpt, height, layer, i, help);
@@ -341,11 +351,12 @@ void printController(tdTree *pRoot, FILE* pToFile, tdOptions *pOpt, int *height,
 			if (pOpt->bConsol) {
 				printf("\n");
 			}
+
 			if (pOpt->bFile) {
 				fprintf(pToFile, "\n");
 			}
 
-			printLines(pToFile, pOpt, height, layer, help);
+			printLines(pToFile, pOpt, height, layer, help/2);
 
 			if (pOpt->bConsol) {
 				printf("\n\n");
@@ -354,9 +365,9 @@ void printController(tdTree *pRoot, FILE* pToFile, tdOptions *pOpt, int *height,
 				fprintf(pToFile, "\n\n");
 			}
 		}
-    } else {
+    } else { /* If not vetical print then horizontal print. */
         printTree(pRoot, pToFile, pOpt, i);
-        if (pOpt->bConsol) {
+        if (pOpt->bConsol) { /* underline lines are used to make trees be separetd from each other. */
             printf("_______________________________________________________\n");
         }
         if (pOpt->bFile) {
