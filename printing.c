@@ -275,7 +275,6 @@ if (layer != *height-1) {
 void printLayer(tdTree *pParent, FILE *pToFile, tdOptions *pOpt, int *height, int layer, int current, int tabCount) {
 	if (pParent && current == layer) { /* When are in right layer and node exist. */
 		printTab(tabCount, pToFile, pOpt);
-
 /*Prints number and then to superscipt its balance indicator using UTF-8 escape sequences. */
 
 		if (pOpt->bFile) {
@@ -308,11 +307,12 @@ void printLayer(tdTree *pParent, FILE *pToFile, tdOptions *pOpt, int *height, in
 		}
 		printTab(tabCount, pToFile, pOpt);
 
-	} else if (pParent && current < layer) { /* When are in too low layer and node exist. */
+	} else if (pParent && current < layer) { /* When in too low layer and node exist. */
+
         printLayer(pParent->pLeft, pToFile, pOpt, height, layer, current + 1, tabCount);
         printLayer(pParent->pRight, pToFile, pOpt, height, layer, current + 1, tabCount);
 
-	} else if (!pParent && current == layer) { /* When are in right layer but node don't exist. */
+	} else if (!pParent && current == layer) { /* When in right layer but node don't exist. */
 		printTab(tabCount, pToFile, pOpt);
 
 		if (pOpt->bFile) {
@@ -326,13 +326,18 @@ void printLayer(tdTree *pParent, FILE *pToFile, tdOptions *pOpt, int *height, in
 		printTab(tabCount, pToFile, pOpt);
 
 	} else if (!pParent && current < layer) { /* When are in too low layer and node don't exist. */
-		if (pOpt->bFile) {
-			fprintf(pToFile, "\t\t\t\t");
+/*fprintf(pToFile, "l:%d c:%d", layer, current);*/
+		printTab((int)pow(2.0, (double)(*height-(current-1))), pToFile, pOpt);
+
+		/*if (pOpt->bFile) {
+			fprintf(pToFile, "\t.\t.\t.\t");
+
 		}
 
 		if (pOpt->bConsol) {
+
 			printf("\t\t\t\t");
-		}
+		}*/
 	}
 }
 

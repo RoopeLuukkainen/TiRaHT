@@ -37,6 +37,14 @@ int main(void) {
 			case 1:                                            /*Adding number*/
 				iAddSel = addMenu();
 
+				if (pOpt->bFile) {
+					if ((pToFile = fopen(pFilename, "a")) == NULL) {
+						/*Open file for appending makes reading file same time possible. */
+						perror("Opening the file failed.\n");
+						pToFile = NULL;
+					}
+				}
+
 				if (iAddSel == 1) {
 					pRoot = addFromFile(pRoot, &tbi, &iHeight, pOpt, pToFile);
 
@@ -83,9 +91,23 @@ int main(void) {
 						free(pFree);
 					}
 				}
+
+				if (pToFile) { /* Closes file when is not needed. */
+					fclose(pToFile);
+				}
+
 				break;
 
 			case 2:                                                 /*Printing*/
+
+				if (pOpt->bFile) {
+					if ((pToFile = fopen(pFilename, "a")) == NULL) {
+						/*Open file for appending makes reading file same time possible. */
+						perror("Opening the file failed.\n");
+						pToFile = NULL;
+					}
+				}
+
 				if (pRoot == NULL) {
 					printf("Puu on tyhjä!\n");
 					break;
@@ -97,6 +119,11 @@ int main(void) {
 
                 printController(pRoot, pToFile, pOpt, &iHeight, 0);
 				printf("\n");
+
+				if (pToFile) { /* Closes file when is not needed. */
+					fclose(pToFile);
+				}
+
 				break;
 
 			case 3:                                                /*Searching*/
@@ -156,12 +183,6 @@ int main(void) {
 					fprintf(pToFile, "BINÄÄRIPUU\n");
 					fclose(pToFile);
 
-					if ((pToFile = fopen(pFilename, "a")) == NULL) {
-						/*Open file for appending makes reading file same time possible. */
-						perror("Opening the file failed.\n");
-						pToFile = NULL;
-					}
-
                 }
 				if (!(pOpt->bFile)) { /* If file writing is OFF there is no need */
 					if (pToFile) { /* for file pointer. */
@@ -180,8 +201,7 @@ int main(void) {
 
 	} while (iMenuSel != 0); /* Loops menu until 0 is selected. */
 
-    if (pToFile) {
-		fclose(pToFile);
+    if (pFilename) {
 		free(pFilename);
     }
 
